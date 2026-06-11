@@ -13,7 +13,7 @@ export function validateData(
       const parsed = schema.parse(payload);
 
       if (source === 'query') {
-        req.query = parsed as unknown as Request['query'];
+        (req as Request & { validatedQuery?: unknown }).validatedQuery = parsed;
       } else {
         req.body = parsed;
       }

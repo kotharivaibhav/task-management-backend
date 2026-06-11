@@ -56,10 +56,50 @@ class UserController {
     }
   }
 
+  async getProfile(req: any, res: Response) {
+    try {
+      const profile = await this.userService.getProfile(req.user);
+      res.status(200).json({
+        message: "Profile retrieved successfully",
+        data: profile,
+        status: "success",
+      });
+    } catch (error: unknown) {
+      throw new Error(error as string);
+    }
+  }
+
+  async updateProfile(req: any, res: Response) {
+    try {
+      const updated = await this.userService.updateProfile(req.user.id, req.body);
+      res.status(200).json({
+        message: "Profile updated successfully",
+        data: updated,
+        status: "success",
+      });
+    } catch (error: unknown) {
+      throw new Error(error as string);
+    }
+  }
+
+  async getDashboardStats(req: any, res: Response) {
+    try {
+      const stats = await this.userService.getDashboardStats(req.user);
+      res.status(200).json({
+        message: "Dashboard stats retrieved successfully",
+        data: stats,
+        status: "success",
+      });
+    } catch (error: unknown) {
+      throw new Error(error as string);
+    }
+  }
+
   async getEmployees(req: Request, res: Response) {
     try {
-      const page = parseInt(req.body.page as string) || 1;
-      const limit = parseInt(req.body.limit as string) || 10;
+      const query = (req as Request & { validatedQuery?: { page?: number; limit?: number } }).validatedQuery;
+      const page = query?.page ?? (parseInt(req.query.page as string) || 1);
+      const limit = query?.limit ?? (parseInt(req.query.limit as string) || 10);
       const userCount = await this.userService.getEmployeeCount();
       const employees = await this.userService.getEmployees(
         page,
@@ -88,9 +128,9 @@ class UserController {
         employeeId = employee.id ?? employee._id.toString();
       }
 
-      const data: CreateEmployeeData = req.body;
+      const data = req.body;
 
-      const updatedEmployee = await this.userService.updateEmployee(employeeId, data);
+      const updatedEmployee = await this.userService.updateEmployee(employeeId, data, req.user);
       res.status(200).json({
         message: "Employee updated successfully",
         data: updatedEmployee,

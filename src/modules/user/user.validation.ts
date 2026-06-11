@@ -31,3 +31,23 @@ export const fetchEmployeeSchema = z.object({
   limit: z.coerce.number().positive().default(10),
 });
 export type FetchEmployeeData = z.infer<typeof fetchEmployeeSchema>;
+
+export const updateEmployeeSchema = z.object({
+  firstName: z.string().min(1).optional(),
+  lastName: z.string().min(1).optional(),
+  email: z.string().email().optional(),
+  phone: z.string().optional(),
+  department: z.string().optional(),
+  designation: z.string().optional(),
+  salary: z.number().positive().optional(),
+  joiningDate: z.coerce.date().optional(),
+  password: z.string().min(8).optional(),
+});
+export type UpdateEmployeeData = z.infer<typeof updateEmployeeSchema>;
+
+export const updateProfileSchema = z.object({
+  name: z.string().min(1).optional(),
+  email: z.string().email().optional(),
+  password: z.string().min(8).optional(),
+});
+export type UpdateProfileData = z.infer<typeof updateProfileSchema>;

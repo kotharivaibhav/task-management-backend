@@ -5,6 +5,8 @@ import { validateData } from "../../utilis/validation.ts";
 import {
   createEmployeeSchema,
   fetchEmployeeSchema,
+  updateEmployeeSchema,
+  updateProfileSchema,
   userLoginSchema,
   userRegistrationSchema,
 } from "./user.validation.ts";
@@ -36,6 +38,28 @@ class UserRoute {
       this.userController.login.bind(this.userController),
     );
 
+    /** get current user profile */
+    this.router.get(
+      "/users/me",
+      authenticate,
+      this.userController.getProfile.bind(this.userController),
+    );
+
+    /** update current user profile */
+    this.router.put(
+      "/users/me",
+      authenticate,
+      validateData(updateProfileSchema),
+      this.userController.updateProfile.bind(this.userController),
+    );
+
+    /** dashboard stats */
+    this.router.get(
+      "/dashboard/stats",
+      authenticate,
+      this.userController.getDashboardStats.bind(this.userController),
+    );
+
     /** create employee */
     this.router.post(
       "/employees",
@@ -50,7 +74,6 @@ class UserRoute {
       "/employees",
       authenticate,
       checkAdmin,
-      validateData(fetchEmployeeSchema),
       this.userController.getEmployees.bind(this.userController),
     );
 
@@ -58,7 +81,7 @@ class UserRoute {
     this.router.put(
       "/employees/:id",
       authenticate,
-      validateData(createEmployeeSchema),
+      validateData(updateEmployeeSchema),
       this.userController.updateEmployee.bind(this.userController),
     );
 

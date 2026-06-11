@@ -1,4 +1,3 @@
-import { th } from "zod/locales";
 import type { ITask } from "./task.model.ts";
 import TaskRepository from "./task.repository.ts";
 
@@ -50,13 +49,23 @@ class TaskService {
     }
   }
 
-  async updateStatus(taskId: string, status: string): Promise<void> {
+  private canAccessTask(task: ITask, user?: any): boolean {
+    const userId = String(user?.id ?? user?._id ?? "");
+    const isAdmin = user?.role === "admin";
+    return isAdmin || task.assignedTo === userId;
+  }
+
+  async updateStatus(taskId: string, status: string, user?: any): Promise<void> {
     try {
       const task = (await this.taskRepository.findById(
         taskId,
       )) as unknown as ITask;
       if (!task) {
         throw new Error("Task not found");
+      }
+
+      if (!this.canAccessTask(task, user)) {
+        throw new Error("Not authorized to update this task status");
       }
 
       await this.taskRepository.update(taskId, { status: status } as ITask);
@@ -109,7 +118,7 @@ class TaskService {
   async addComment(
     taskId: string,
     comment: string,
-    userId: string,
+    user: any,
   ): Promise<void> {
     try {
       const task = (await this.taskRepository.findById(
@@ -118,6 +127,12 @@ class TaskService {
       if (!task) {
         throw new Error("Task not found");
       }
+
+      if (!this.canAccessTask(task, user)) {
+        throw new Error("Not authorized to comment on this task");
+      }
+
+      const userId = String(user?.id ?? user?._id ?? "");
       const newComment = {
         message: comment,
         createdBy: userId,

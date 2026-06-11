@@ -10,7 +10,8 @@ class ErrorHandler {
     res: Response,
     next: NextFunction
   ) {
-    res.status(500).json({ message: error.message });
+    console.error("Server error:", error);
+    res.status(500).json({ message: error.message || "Internal Server Error" });
   }
 }
 

@@ -61,7 +61,7 @@ class TaskController {
       const taskId = req.params.id as string;
       const { status } = req.body;
 
-      await this.taskService.updateStatus(taskId, status);
+      await this.taskService.updateStatus(taskId, status, (req as any).user);
       res.status(200).json({
         message: "Task status updated successfully",
         status: "success",
@@ -103,7 +103,7 @@ class TaskController {
     try {
       const taskId = req.params.id as string;
       const { comment } = req.body;
-      await this.taskService.addComment(taskId, comment, req.user?.id as string);
+      await this.taskService.addComment(taskId, comment, req.user);
       res.status(200).json({
         message: "Comment added successfully",
         status: "success",
